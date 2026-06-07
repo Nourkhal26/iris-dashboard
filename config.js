@@ -19,7 +19,7 @@ const IRIS_CONFIG = {
     {
       id: 'capitalism',
       name: 'Capitalism.com',
-sheetUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTKc7hflUCBf8-tkX5c-CottOTHEStLMKpfEfbwiLEPztZiZA0e9gwiWk-ce5V-jklJUpD9QGsiH7iv/pub?gid=979060701&single=true&output=csv',      users: [
+sheetUrl: 'https://corsproxy.io/?https://docs.google.com/spreadsheets/d/e/2PACX-1vTKc7hflUCBf8-tkX5c-CottOTHEStLMKpfEfbwiLEPztZiZA0e9gwiWk-ce5V-jklJUpD9QGsiH7iv/pub?gid=979060701&single=true&output=csv',      users: [
         { email: 'manager@capitalism.com', password: 'client123', role: 'client' }
       ],
       closers: ['Walter', 'Doru', 'Jason', 'Finlay', 'Aaron', 'Ryan']
