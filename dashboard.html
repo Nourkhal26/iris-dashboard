@@ -148,10 +148,26 @@ function init(){
 }
 
 function fetchSheet(url){
-  return fetch(url).then(function(r){
-    if(!r.ok) throw new Error('HTTP '+r.status);
-    return r.text();
-  }).then(function(text){return parseCSV(text);});
+  var rawUrl=url.replace('https://corsproxy.io/?','').replace('https://api.allorigins.win/raw?url=','');
+  var proxies=[
+    'https://api.allorigins.win/raw?url='+encodeURIComponent(rawUrl),
+    'https://corsproxy.io/?'+rawUrl,
+    rawUrl
+  ];
+  function tryNext(index){
+    if(index>=proxies.length)return Promise.reject(new Error('All proxies failed'));
+    return fetch(proxies[index]).then(function(r){
+      if(!r.ok)throw new Error('HTTP '+r.status);
+      return r.text();
+    }).then(function(text){
+      if(!text||text.length<10)throw new Error('Empty response');
+      return parseCSV(text);
+    }).catch(function(e){
+      console.log('Proxy '+index+' failed, trying next...');
+      return tryNext(index+1);
+    });
+  }
+  return tryNext(0);
 }
 
 function parseCSV(text){
