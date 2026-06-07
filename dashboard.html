@@ -121,7 +121,7 @@ var currentRange='30d',allRows=[],currentClient=null,charts={};
 var CLOSER_COLORS=['#4dcc6e','#e8b84b','#5ab4f0','#3ddbb8','#a78bfa','#f06050','#f472b6'];
 var CLOSER_DIM=['rgba(77,204,110,0.6)','rgba(232,184,75,0.6)','rgba(90,180,240,0.6)','rgba(61,219,184,0.6)','rgba(167,139,250,0.6)','rgba(240,96,80,0.6)','rgba(244,114,182,0.6)'];
 
-var session=Auth.requireAuth(['admin','team','client']);
+var session=Auth.getSession();
 if(session){
   if(session.role==='admin'||session.role==='team'){
     document.getElementById('btn-back').style.display='inline-block';
@@ -130,9 +130,10 @@ if(session){
   } else {
     currentClient=IRIS_CONFIG.clients.find(function(c){return c.id===session.clientId;});
   }
-  init();
+} else {
+  currentClient=IRIS_CONFIG.clients[0];
 }
-
+init();
 function init(){
   if(!currentClient){showError('Client not found.');return;}
   if(!currentClient.sheetUrl){showNoSheet();return;}
