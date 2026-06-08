@@ -281,11 +281,11 @@ function detectCols(rows) {
     return Object.keys(r).some(function(k){ return k.toLowerCase().indexOf('cash')>-1; });
   }) || rows[0];
   COLS.date = findColKey(sample, ['date']) || 'Date';
-  COLS.cash = findColKey(sample, ['cash collected','cash']) || 'Cash Collected';
+  COLS.cash = findColKey(sample, ['cash collected','cash']) || 'Cash';
   COLS.contract = findColKey(sample, ['revenue']) || 'Revenue';
   COLS.product = findColKey(sample, ['top/inc','product']) || 'TOP/INC';
   COLS.setter = findColKey(sample, ['setter']) || 'Setter';
-  COLS.closer = findColKey(sample, ['closer','sales person']) || 'Sales Person/ Closer';
+  COLS.closer = findColKey(sample, ['closer','sales person','sales']) || 'Sales';
   console.log('COLS detected:', COLS);
 }
 
