@@ -235,24 +235,33 @@ function setRange(btn, r) {
 
 function parseDate(s) {
   if (!s) return null;
-  s = s.trim();
-  // Handle formats: 4/1, 4/1/26, 4/1/2026, 04/01/2026
+  s = s.toString().trim();
+  if (!s || s === '' || s === 'Date') return null;
+  
+  // Remove any time component
+  s = s.split(' ')[0].split('T')[0];
+  
   var parts = s.split('/');
-  if (parts.length === 2) {
-    // MM/DD — assume current or recent year
-    var m = parseInt(parts[0]), d = parseInt(parts[1]);
-    var yr = new Date().getFullYear();
-    // If month is Dec and we're early in year, assume last year
-    if (m === 12 && new Date().getMonth() < 3) yr = yr - 1;
-    return new Date(yr, m-1, d);
-  } else if (parts.length === 3) {
-    var m = parseInt(parts[0]), d = parseInt(parts[1]);
-    var yr = parseInt(parts[2]);
-    if (yr < 100) yr += 2000;
-    return new Date(yr, m-1, d);
+  if (parts.length >= 2) {
+    var m = parseInt(parts[0]);
+    var d = parseInt(parts[1]);
+    if (isNaN(m) || isNaN(d)) return null;
+    var yr;
+    if (parts.length === 3) {
+      yr = parseInt(parts[2]);
+      if (yr < 100) yr += 2000;
+    } else {
+      // MM/DD only — figure out year from context
+      yr = new Date().getFullYear();
+      // If month hasn't happened yet this year, it might be last year
+      var now = new Date();
+      var testDate = new Date(yr, m-1, d);
+      if (testDate > now) yr -= 1;
+    }
+    var result = new Date(yr, m-1, d);
+    return isNaN(result.getTime()) ? null : result;
   }
-  var dt = new Date(s);
-  return isNaN(dt) ? null : dt;
+  return null;
 }
 
 function parseMoney(s) {
