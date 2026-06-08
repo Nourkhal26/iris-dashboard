@@ -174,30 +174,21 @@ function splitCSVLine(line) {
   return result;
 }
 
-// Fetch one tab
+// Fetch one tab via Cloudflare Worker
 function fetchTab(tabName) {
-  var url = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:csv&sheet=' + encodeURIComponent(tabName);
-  var proxies = [
-    'https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
-    'https://corsproxy.io/?' + encodeURIComponent(url),
-    url
-  ];
-  function tryNext(i) {
-    if (i >= proxies.length) return Promise.resolve([]);
-    return fetch(proxies[i])
-      .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.text(); })
-      .then(function(t){
-        if(!t || t.length < 20) return [];
-        var rows = parseCSV(t);
-        console.log('Tab '+tabName+': '+rows.length+' rows');
-        return rows;
-      })
-      .catch(function(e){
-        console.warn('Tab '+tabName+' proxy '+i+' failed: '+e.message);
-        return tryNext(i+1);
-      });
-  }
-  return tryNext(0);
+  var url = 'https://morning-water-057d.nour-2ba.workers.dev/?sheet=' + encodeURIComponent(tabName);
+  return fetch(url)
+    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.text(); })
+    .then(function(t){
+      if(!t || t.length < 20) return [];
+      var rows = parseCSV(t);
+      console.log('Tab '+tabName+': '+rows.length+' rows');
+      return rows;
+    })
+    .catch(function(e){
+      console.warn('Tab '+tabName+' failed: '+e.message);
+      return [];
+    });
 }
 
 // Fetch all tabs and combine
