@@ -20,11 +20,11 @@ body{background:var(--bg);color:var(--t1);font-size:13px;line-height:1.5;min-hei
 .logo-wrap{display:flex;align-items:center;gap:10px}
 .logo-wrap img{width:32px;height:32px;border-radius:7px}
 .logo{font-family:"Cormorant Garamond",serif;font-size:20px;font-weight:600;color:#fff;letter-spacing:.05em}
-.period-badge{font-size:11px;font-weight:600;padding:5px 12px;border-radius:6px;background:var(--grn);color:#0a1a0f}
+.period-badge{font-size:11px;font-weight:600;padding:5px 12px;border-radius:6px;background:var(--grn);color:#0a1a0f;white-space:nowrap}
 .topbar-r{display:flex;align-items:center;gap:10px;margin-left:auto}
 .cap-label{font-size:11px;color:var(--t3);font-family:"DM Mono",monospace}
 .range-wrap{display:flex;gap:6px}
-.range-btn{font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid var(--brd2);background:var(--bg-card);color:var(--t3);cursor:pointer}
+.range-btn{font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid var(--brd2);background:var(--bg-card);color:var(--t3);cursor:pointer;transition:all .15s}
 .range-btn.active{border-color:var(--grn);color:var(--grn);background:var(--grn-d)}
 .main{padding:20px 24px;display:flex;flex-direction:column;gap:18px;max-width:1440px;margin:0 auto}
 .sec-label{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--grn);margin-bottom:10px}
@@ -71,7 +71,9 @@ table.ct{width:100%;border-collapse:collapse}
 .spinner{width:32px;height:32px;border:2px solid var(--brd2);border-top-color:var(--grn);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-text{font-size:13px;color:var(--t3)}
-.error-box{background:rgba(240,96,80,0.08);border:1px solid rgba(240,96,80,0.2);border-radius:10px;padding:20px;text-align:center;color:#f06050;font-size:13px;line-height:1.7}
+.progress-bar-wrap{width:200px;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden}
+.progress-bar{height:100%;background:var(--grn);border-radius:2px;transition:width .3s ease}
+.error-box{background:rgba(240,96,80,0.08);border:1px solid rgba(240,96,80,0.2);border-radius:10px;padding:20px;text-align:center;color:#f06050;font-size:13px;line-height:1.7;margin:24px}
 .error-box strong{display:block;margin-bottom:4px;font-size:15px}
 .footer{padding:14px 24px;border-top:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between;margin-top:4px}
 .footer-l{display:flex;align-items:center;gap:8px;font-size:10px;color:rgba(255,255,255,0.2)}
@@ -82,7 +84,8 @@ table.ct{width:100%;border-collapse:collapse}
 
 <div class="loading-overlay" id="loading">
   <div class="spinner"></div>
-  <div class="loading-text" id="loading-text">Loading dashboard...</div>
+  <div class="loading-text" id="loading-text">Loading all tabs...</div>
+  <div class="progress-bar-wrap"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
 </div>
 
 <div id="app" style="display:none">
@@ -93,10 +96,12 @@ table.ct{width:100%;border-collapse:collapse}
     </div>
     <div class="period-badge" id="period-badge">Loading...</div>
     <div class="range-wrap">
-      <button class="range-btn" onclick="setRange(this,'7d')">7d</button>
+      <button class="range-btn" onclick="setRange(this,'mtd')">MTD</button>
       <button class="range-btn active" onclick="setRange(this,'30d')">30d</button>
       <button class="range-btn" onclick="setRange(this,'90d')">90d</button>
-      <button class="range-btn" onclick="setRange(this,'mtd')">MTD</button>
+      <button class="range-btn" onclick="setRange(this,'180d')">6mo</button>
+      <button class="range-btn" onclick="setRange(this,'365d')">1yr</button>
+      <button class="range-btn" onclick="setRange(this,'all')">All</button>
     </div>
     <div class="topbar-r">
       <span class="cap-label">capitalism.com</span>
@@ -113,53 +118,120 @@ table.ct{width:100%;border-collapse:collapse}
 </div>
 
 <script>
-// ── CONFIG ── paste your Google Sheet CSV URL below
-var SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTKc7hflUCBf8-tkX5c-CottOTHEStLMKpfEfbwiLEPztZiZA0e9gwiWk-ce5V-jklJUpD9QGsiH7iv/pub?output=csv';
+var SHEET_ID = '1gFFYERPVQX_xK6Rt4lg4CJgnNtO7R5CSdfjufiab-Y8';
+var TABS = ['12.2025','1.2026','2.2026','3.2026','4.2026','5.2026','6.2026'];
 
-var CLOSER_COLORS = ['#4dcc6e','#e8b84b','#5ab4f0','#3ddbb8','#a78bfa','#f06050','#f472b6'];
-var CLOSER_DIM    = ['rgba(77,204,110,0.6)','rgba(232,184,75,0.6)','rgba(90,180,240,0.6)','rgba(61,219,184,0.6)','rgba(167,139,250,0.6)','rgba(240,96,80,0.6)','rgba(244,114,182,0.6)'];
-var COLS = {date:'Date',product:'TOP/INC',cash:'Cash Collected',contract:'Revenue',setter:'Setter',closer:'Sales Person/ Closer'};
+var CLOSER_COLORS = ['#4dcc6e','#e8b84b','#5ab4f0','#3ddbb8','#a78bfa','#f06050','#f472b6','#fb923c'];
+var CLOSER_DIM = ['rgba(77,204,110,0.6)','rgba(232,184,75,0.6)','rgba(90,180,240,0.6)','rgba(61,219,184,0.6)','rgba(167,139,250,0.6)','rgba(240,96,80,0.6)','rgba(244,114,182,0.6)','rgba(251,146,60,0.6)'];
+
 var currentRange = '30d';
 var allRows = [];
 var charts = {};
 
-// ── FETCH ──
-function fetchSheet(url) {
-  var clean = url;
+// Normalize a header key
+function norm(k) {
+  return (k||'').replace(/[\r\n]+/g,' ').replace(/\s+/g,' ').trim().toLowerCase();
+}
+
+// Find the right column key from a row
+function findColKey(sampleRow, terms) {
+  var keys = Object.keys(sampleRow);
+  for (var i=0; i<keys.length; i++) {
+    var n = norm(keys[i]);
+    for (var j=0; j<terms.length; j++) {
+      if (n.indexOf(terms[j]) > -1) return keys[i];
+    }
+  }
+  return null;
+}
+
+// Parse CSV text into array of objects
+function parseCSV(text) {
+  var lines = text.trim().split('\n');
+  if (lines.length < 2) return [];
+  var headers = lines[0].split(',').map(function(h){ return h.replace(/^"|"$/g,'').trim(); });
+  var rows = [];
+  for (var i=1; i<lines.length; i++) {
+    var vals = splitCSVLine(lines[i]);
+    var obj = {};
+    headers.forEach(function(h, idx) {
+      obj[h] = (vals[idx]||'').replace(/^"|"$/g,'').trim();
+    });
+    // Only include rows with a date
+    if (obj[headers[0]] && obj[headers[0]].match(/\d/)) rows.push(obj);
+  }
+  return rows;
+}
+
+function splitCSVLine(line) {
+  var result = [], current = '', inQuotes = false;
+  for (var i=0; i<line.length; i++) {
+    if (line[i] === '"') { inQuotes = !inQuotes; }
+    else if (line[i] === ',' && !inQuotes) { result.push(current); current = ''; }
+    else { current += line[i]; }
+  }
+  result.push(current);
+  return result;
+}
+
+// Fetch one tab
+function fetchTab(tabName) {
+  var url = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:csv&sheet=' + encodeURIComponent(tabName);
   var proxies = [
-    'https://api.allorigins.win/raw?url=' + encodeURIComponent(clean),
-    'https://corsproxy.io/?' + encodeURIComponent(clean),
-    'https://thingproxy.freeboard.io/fetch/' + clean,
-    clean
+    'https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
+    'https://corsproxy.io/?' + encodeURIComponent(url),
+    url
   ];
   function tryNext(i) {
-    if (i >= proxies.length) return Promise.reject(new Error('Could not load sheet after trying all proxies'));
+    if (i >= proxies.length) return Promise.resolve([]);
     return fetch(proxies[i])
       .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.text(); })
-      .then(function(t){ if(!t||t.length<10) throw new Error('Empty'); return parseCSV(t); })
-      .catch(function(e){ console.warn('Proxy '+i+' failed:',e.message); return tryNext(i+1); });
+      .then(function(t){
+        if(!t || t.length < 20) return [];
+        var rows = parseCSV(t);
+        console.log('Tab '+tabName+': '+rows.length+' rows');
+        return rows;
+      })
+      .catch(function(e){
+        console.warn('Tab '+tabName+' proxy '+i+' failed: '+e.message);
+        return tryNext(i+1);
+      });
   }
   return tryNext(0);
 }
 
-function parseCSV(text) {
-  var lines = text.trim().split('\n');
-  var headers = lines[0].split(',').map(function(h){ return h.replace(/"/g,'').trim(); });
-  return lines.slice(1).map(function(line){
-    var vals = line.split(',');
-    var obj = {};
-    headers.forEach(function(h,i){ obj[h] = (vals[i]||'').replace(/"/g,'').trim(); });
-    return obj;
-  }).filter(function(r){ return Object.values(r).some(function(v){ return v; }); });
+// Fetch all tabs and combine
+function fetchAllTabs() {
+  var progress = document.getElementById('progress-bar');
+  var label = document.getElementById('loading-text');
+  var completed = 0;
+  
+  var promises = TABS.map(function(tab) {
+    return fetchTab(tab).then(function(rows) {
+      completed++;
+      var pct = (completed / TABS.length) * 100;
+      progress.style.width = pct + '%';
+      label.textContent = 'Loading ' + tab + '... (' + completed + '/' + TABS.length + ')';
+      return rows;
+    });
+  });
+  
+  return Promise.all(promises).then(function(results) {
+    var combined = [];
+    results.forEach(function(rows) { combined = combined.concat(rows); });
+    return combined;
+  });
 }
 
-// ── DATE ──
+// Date range
 function getRange(range) {
   var now = new Date(), start = new Date(now);
-  if (range==='7d') start.setDate(start.getDate()-7);
-  else if (range==='30d') start.setDate(start.getDate()-30);
-  else if (range==='90d') start.setDate(start.getDate()-90);
-  else start = new Date(now.getFullYear(), now.getMonth(), 1);
+  if (range === 'mtd') start = new Date(now.getFullYear(), now.getMonth(), 1);
+  else if (range === '30d') start.setDate(start.getDate()-30);
+  else if (range === '90d') start.setDate(start.getDate()-90);
+  else if (range === '180d') start.setDate(start.getDate()-180);
+  else if (range === '365d') start.setDate(start.getDate()-365);
+  else if (range === 'all') start = new Date('2020-01-01');
   return {start:start, end:now};
 }
 
@@ -170,86 +242,143 @@ function setRange(btn, r) {
   render();
 }
 
-function parseDate(s) { if(!s) return null; var d=new Date(s); return isNaN(d)?null:d; }
-function parseMoney(s) { if(!s) return 0; var n=parseFloat(s.replace(/[$,\s]/g,'')); return isNaN(n)?0:n; }
-function fmt$(n) { return '$'+Math.round(n).toLocaleString(); }
+function parseDate(s) {
+  if (!s) return null;
+  s = s.trim();
+  // Handle formats: 4/1, 4/1/26, 4/1/2026, 04/01/2026
+  var parts = s.split('/');
+  if (parts.length === 2) {
+    // MM/DD — assume current or recent year
+    var m = parseInt(parts[0]), d = parseInt(parts[1]);
+    var yr = new Date().getFullYear();
+    // If month is Dec and we're early in year, assume last year
+    if (m === 12 && new Date().getMonth() < 3) yr = yr - 1;
+    return new Date(yr, m-1, d);
+  } else if (parts.length === 3) {
+    var m = parseInt(parts[0]), d = parseInt(parts[1]);
+    var yr = parseInt(parts[2]);
+    if (yr < 100) yr += 2000;
+    return new Date(yr, m-1, d);
+  }
+  var dt = new Date(s);
+  return isNaN(dt) ? null : dt;
+}
 
-// ── RENDER ──
+function parseMoney(s) {
+  if (!s) return 0;
+  var n = parseFloat(s.replace(/[$,\s"]/g,''));
+  return isNaN(n) ? 0 : n;
+}
+
+function fmt$(n) { return '$' + Math.round(n).toLocaleString(); }
+
+// Find columns dynamically from a sample row
+var COLS = {};
+function detectCols(rows) {
+  if (!rows.length) return;
+  var sample = rows[0];
+  COLS.date = findColKey(sample, ['date']) || 'Date';
+  COLS.cash = findColKey(sample, ['cash collected','cash']) || 'Cash Collected';
+  COLS.contract = findColKey(sample, ['revenue']) || 'Revenue';
+  COLS.product = findColKey(sample, ['top/inc','product']) || 'TOP/INC';
+  COLS.setter = findColKey(sample, ['setter']) || 'Setter';
+  COLS.closer = findColKey(sample, ['closer','sales person']) || 'Sales Person/ Closer';
+  console.log('COLS detected:', COLS);
+}
+
+// Render
 function render() {
   var dr = getRange(currentRange);
-  var filtered = allRows.filter(function(r){
+  var filtered = allRows.filter(function(r) {
     var d = parseDate(r[COLS.date]);
     return d && d >= dr.start && d <= dr.end;
   });
 
-  var periodStr = dr.start.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' - ' + dr.end.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  var periodStr = dr.start.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' - ' + dr.end.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
   document.getElementById('period-badge').textContent = 'Capitalism.com - ' + periodStr;
-  document.getElementById('footer-period').textContent = periodStr;
+  document.getElementById('footer-period').textContent = 'Total rows: ' + allRows.length + ' | Filtered: ' + filtered.length;
 
   var totalCash=0, totalContract=0;
-  filtered.forEach(function(r){ totalCash+=parseMoney(r[COLS.cash]); totalContract+=parseMoney(r[COLS.contract]); });
+  filtered.forEach(function(r){
+    totalCash += parseMoney(r[COLS.cash]);
+    totalContract += parseMoney(r[COLS.contract]);
+  });
   var deals = filtered.filter(function(r){ return parseMoney(r[COLS.cash])>0; }).length;
   var avgCash = deals>0 ? totalCash/deals : 0;
 
-  // closers
+  // Closers
   var cMap = {};
   filtered.forEach(function(r){
-    var c = r[COLS.closer]||'Unassigned';
-    if(!cMap[c]) cMap[c]={cash:0,contract:0,deals:0};
-    cMap[c].cash += parseMoney(r[COLS.cash]);
-    cMap[c].contract += parseMoney(r[COLS.contract]);
-    if(parseMoney(r[COLS.cash])>0) cMap[c].deals++;
+    var c = (r[COLS.closer]||'Unassigned').trim();
+    if (!c) c = 'Unassigned';
+    if (!cMap[c]) cMap[c]={cash:0,contract:0,deals:0};
+    var cash = parseMoney(r[COLS.cash]);
+    var rev = parseMoney(r[COLS.contract]);
+    cMap[c].cash += cash;
+    cMap[c].contract += rev;
+    if (cash > 0) cMap[c].deals++;
   });
-  var closers = Object.entries(cMap).sort(function(a,b){return b[1].cash-a[1].cash;});
+  var closers = Object.entries(cMap).filter(function(c){ return c[1].cash > 0; }).sort(function(a,b){ return b[1].cash-a[1].cash; });
 
-  // setters
+  // Setters
   var sMap = {};
   filtered.forEach(function(r){
-    var s = r[COLS.setter]||'';
-    if(!s||s==='N/A') return;
-    s.split('/').forEach(function(n){ n=n.trim(); if(!sMap[n])sMap[n]=0; sMap[n]++; });
+    var s = (r[COLS.setter]||'').trim();
+    if (!s || s==='N/A' || s==='N/a') return;
+    s.split('/').forEach(function(n){
+      n = n.trim();
+      if (n) { if(!sMap[n])sMap[n]=0; sMap[n]++; }
+    });
   });
-  var setters = Object.entries(sMap).sort(function(a,b){return b[1]-a[1];});
+  var setters = Object.entries(sMap).sort(function(a,b){ return b[1]-a[1]; }).slice(0,8);
 
-  // products
+  // Products
   var pMap = {};
   filtered.forEach(function(r){
-    var p = r[COLS.product]||'Other';
-    if(p.toUpperCase().indexOf('TOP')>-1) p='TOP Program';
-    else if(p.toLowerCase().indexOf('renewal')>-1) p='Renewal';
-    else if(p.toLowerCase().indexOf('accel')>-1) p='Accelerator';
-    if(!pMap[p]) pMap[p]={count:0,value:0};
-    pMap[p].count++; pMap[p].value+=parseMoney(r[COLS.contract]);
+    var p = (r[COLS.product]||'Other').trim();
+    if (!p) p = 'Other';
+    if (p.toUpperCase().indexOf('TOP')>-1 && p.toLowerCase().indexOf('accel')==-1 && p.toLowerCase().indexOf('renewal')==-1) p='TOP Program';
+    else if (p.toLowerCase().indexOf('renewal')>-1) p='Renewal';
+    else if (p.toLowerCase().indexOf('accel')>-1) p='Accelerator';
+    if (!pMap[p]) pMap[p]={count:0,value:0};
+    pMap[p].count++;
+    pMap[p].value += parseMoney(r[COLS.contract]);
   });
-  var products = Object.entries(pMap).sort(function(a,b){return b[1].value-a[1].value;});
+  var products = Object.entries(pMap).filter(function(p){ return p[1].value>0; }).sort(function(a,b){ return b[1].value-a[1].value; });
 
-  // daily
+  // Daily cash
   var dMap = {};
   filtered.forEach(function(r){
-    var d=parseDate(r[COLS.date]); if(!d) return;
-    var k=d.toISOString().split('T')[0];
-    if(!dMap[k]) dMap[k]=0;
-    dMap[k]+=parseMoney(r[COLS.cash]);
+    var d = parseDate(r[COLS.date]);
+    if (!d) return;
+    var k = d.toISOString().split('T')[0];
+    if (!dMap[k]) dMap[k]=0;
+    dMap[k] += parseMoney(r[COLS.cash]);
   });
-  var days=Object.keys(dMap).sort();
-  var dayLabels=days.map(function(d){var dt=new Date(d+'T12:00:00');return(dt.getMonth()+1)+'/'+dt.getDate();});
-  var dayVals=days.map(function(d){return dMap[d];});
+  var days = Object.keys(dMap).sort();
+  var dayLabels = days.map(function(d){
+    var dt = new Date(d+'T12:00:00');
+    return (dt.getMonth()+1)+'/'+(dt.getDate());
+  });
+  var dayVals = days.map(function(d){ return dMap[d]; });
 
-  var pColors=['var(--grn)','var(--blu)','var(--amb)','var(--tel)','var(--pur)'];
-  var maxP=products[0]?products[0][1].value:1;
-  var productHTML=products.map(function(p,i){
+  // Build HTML
+  var pColors = ['var(--grn)','var(--blu)','var(--amb)','var(--tel)','var(--pur)'];
+  var maxP = products[0] ? products[0][1].value : 1;
+  var productHTML = products.map(function(p,i){
     return '<div class="pip-row"><div class="pip-dot" style="background:'+pColors[i%5]+'"></div><div class="pip-name">'+p[0]+'</div><div class="pip-bar-wrap"><div class="pip-bar-bg"><div class="pip-bar-fill" style="width:'+(p[1].value/maxP*100)+'%;background:'+pColors[i%5]+'"></div></div></div><div class="pip-n">'+p[1].count+'</div><div class="pip-v">'+fmt$(p[1].value)+'</div></div>';
-  }).join('');
+  }).join('') || '<div style="color:rgba(255,255,255,0.3);font-size:12px">No data</div>';
 
-  var maxS=setters[0]?setters[0][1]:1;
-  var setterHTML=setters.map(function(s){
+  var maxS = setters[0] ? setters[0][1] : 1;
+  var setterHTML = setters.map(function(s){
     return '<div class="stat-row"><div class="stat-name">'+s[0]+'</div><div class="stat-bar-wrap"><div class="stat-bar" style="width:'+(s[1]/maxS*100)+'%"></div></div><div class="stat-val">'+s[1]+'</div></div>';
-  }).join('');
+  }).join('') || '<div style="color:rgba(255,255,255,0.3);font-size:12px">No data</div>';
 
-  var closerHTML=closers.map(function(c,i){
-    var col=CLOSER_COLORS[i%CLOSER_COLORS.length];
-    return '<tr><td><div class="cn"><div class="av" style="background:'+col+'22;color:'+col+'">'+c[0].charAt(0)+'</div>'+c[0]+'</div></td><td style="color:#fff;font-weight:600">'+fmt$(c[1].cash)+'</td><td>'+fmt$(c[1].contract)+'</td><td>'+c[1].deals+'</td><td>'+fmt$(c[1].deals>0?c[1].cash/c[1].deals:0)+'</td><td>'+fmt$(c[1].deals>0?c[1].cash/c[1].deals:0)+'</td></tr>';
-  }).join('');
+  var closerHTML = closers.map(function(c,i){
+    var col = CLOSER_COLORS[i%CLOSER_COLORS.length];
+    var avg = c[1].deals>0 ? c[1].cash/c[1].deals : 0;
+    return '<tr><td><div class="cn"><div class="av" style="background:'+col+'22;color:'+col+'">'+c[0].charAt(0)+'</div>'+c[0]+'</div></td><td style="color:#fff;font-weight:600">'+fmt$(c[1].cash)+'</td><td>'+fmt$(c[1].contract)+'</td><td>'+c[1].deals+'</td><td>'+fmt$(avg)+'</td><td>'+fmt$(avg)+'</td></tr>';
+  }).join('') || '<tr><td colspan="6" style="text-align:center;color:rgba(255,255,255,0.3);padding:20px">No data for this period</td></tr>';
 
   document.getElementById('main-content').innerHTML =
     '<div><div class="sec-label">Revenue &amp; cash</div><div class="grid4">' +
@@ -258,12 +387,13 @@ function render() {
     '<div class="mcard"><div class="accent-bar" style="background:var(--blu)"></div><div class="mlabel">Deals Closed</div><div class="mval" style="color:var(--blu)">'+deals+'</div><div class="msub">Cash &gt; $0</div></div>' +
     '<div class="mcard"><div class="accent-bar" style="background:var(--amb)"></div><div class="mlabel">Avg Cash / Deal</div><div class="mval" style="color:var(--amb)">'+fmt$(avgCash)+'</div><div class="msub">Cash divided by deals</div></div>' +
     '</div></div>' +
-    '<div><div class="sec-label">Closer performance</div><div class="tcard"><div class="thead2">Individual closer breakdown</div><div style="overflow-x:auto"><table class="ct"><thead><tr><th>Closer</th><th>Cash Collected</th><th>Contract Value</th><th>Deals Won</th><th>Avg Cash/Deal</th><th>Avg Cash Collected</th></tr></thead><tbody>'+(closerHTML||'<tr><td colspan="6" style="text-align:center;color:rgba(255,255,255,0.3);padding:20px">No data for this period</td></tr>')+'</tbody></table></div></div></div>' +
+    '<div><div class="sec-label">Closer performance</div><div class="tcard"><div class="thead2">Individual closer breakdown</div><div style="overflow-x:auto"><table class="ct"><thead><tr><th>Closer</th><th>Cash Collected</th><th>Contract Value</th><th>Deals Won</th><th>Avg Cash / Deal</th><th>Avg Cash Collected</th></tr></thead><tbody>'+closerHTML+'</tbody></table></div></div></div>' +
     '<div class="grid21"><div class="ccard"><div class="ctitle">Cash collected by day <span>'+periodStr+'</span></div><div style="position:relative;height:190px"><canvas id="revChart"></canvas></div></div>' +
-    '<div class="ccard"><div class="ctitle">Product mix</div>'+(productHTML||'<div style="color:rgba(255,255,255,0.3)">No data</div>')+'<div class="ctitle" style="margin-top:18px;margin-bottom:10px">Deals set by setter</div>'+(setterHTML||'<div style="color:rgba(255,255,255,0.3)">No data</div>')+'</div></div>' +
+    '<div class="ccard"><div class="ctitle">Product mix</div>'+productHTML+'<div class="ctitle" style="margin-top:18px;margin-bottom:10px">Deals set by setter</div>'+setterHTML+'</div></div>' +
     '<div class="grid2"><div class="ccard"><div class="ctitle">Revenue by closer</div><div style="position:relative;height:200px"><canvas id="closerRevChart"></canvas></div></div><div class="ccard"><div class="ctitle">Cash collected by closer</div><div style="position:relative;height:200px"><canvas id="closerCashChart"></canvas></div></div></div>' +
     '<div class="ccard"><div class="ctitle">Signed revenue distribution by closer</div><div style="position:relative;height:240px"><canvas id="revPieChart"></canvas></div></div>';
 
+  // Charts
   Object.values(charts).forEach(function(c){c.destroy();}); charts={};
   var gc='rgba(255,255,255,0.05)',tc='rgba(255,255,255,0.25)';
   var cNames=closers.map(function(c){return c[0].split(' ')[0];});
@@ -272,29 +402,31 @@ function render() {
   var cColors=closers.map(function(_,i){return CLOSER_COLORS[i%CLOSER_COLORS.length];});
   var cDim=closers.map(function(_,i){return CLOSER_DIM[i%CLOSER_DIM.length];});
 
-  if(dayLabels.length){
-    charts.rev=new Chart(document.getElementById('revChart'),{type:'bar',data:{labels:dayLabels,datasets:[{data:dayVals,backgroundColor:'rgba(77,204,110,0.65)',borderColor:'#4dcc6e',borderWidth:1,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return '$'+Math.round(c.raw).toLocaleString();}}}},scales:{x:{grid:{color:gc},ticks:{color:tc,font:{size:9},autoSkip:true,maxTicksLimit:15,maxRotation:45}},y:{grid:{color:gc},ticks:{color:tc,font:{size:9},callback:function(v){return v>=1000?'$'+(v/1000).toFixed(0)+'k':'$'+v;}}}}}});
+  if (dayLabels.length) {
+    charts.rev = new Chart(document.getElementById('revChart'),{type:'bar',data:{labels:dayLabels,datasets:[{data:dayVals,backgroundColor:'rgba(77,204,110,0.65)',borderColor:'#4dcc6e',borderWidth:1,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return '$'+Math.round(c.raw).toLocaleString();}}}},scales:{x:{grid:{color:gc},ticks:{color:tc,font:{size:9},autoSkip:true,maxTicksLimit:20,maxRotation:45}},y:{grid:{color:gc},ticks:{color:tc,font:{size:9},callback:function(v){return v>=1000?'$'+(v/1000).toFixed(0)+'k':'$'+v;}}}}}});
   }
-  if(cNames.length){
-    charts.cRev=new Chart(document.getElementById('closerRevChart'),{type:'bar',data:{labels:cNames,datasets:[{data:cRev,backgroundColor:cDim,borderColor:cColors,borderWidth:1,borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return '$'+c.raw.toLocaleString();}}}},scales:{x:{grid:{color:gc},ticks:{color:'rgba(255,255,255,0.5)',font:{size:11}}},y:{grid:{color:gc},ticks:{color:tc,font:{size:9},callback:function(v){return '$'+(v/1000).toFixed(0)+'k';}}}}}});
-    charts.cCash=new Chart(document.getElementById('closerCashChart'),{type:'bar',data:{labels:cNames,datasets:[{data:cCash,backgroundColor:cDim,borderColor:cColors,borderWidth:1,borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return '$'+c.raw.toLocaleString();}}}},scales:{x:{grid:{color:gc},ticks:{color:'rgba(255,255,255,0.5)',font:{size:11}}},y:{grid:{color:gc},ticks:{color:tc,font:{size:9},callback:function(v){return '$'+(v/1000).toFixed(0)+'k';}}}}}});
-    charts.pie=new Chart(document.getElementById('revPieChart'),{type:'doughnut',data:{labels:closers.map(function(c){return c[0];}),datasets:[{data:cRev,backgroundColor:cDim,borderColor:cColors,borderWidth:2,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{position:'right',labels:{color:'rgba(255,255,255,0.75)',font:{size:11},padding:14,boxWidth:12,boxHeight:12}},tooltip:{callbacks:{label:function(c){return c.label+': $'+c.raw.toLocaleString();}}}}}});
+  if (cNames.length) {
+    charts.cRev = new Chart(document.getElementById('closerRevChart'),{type:'bar',data:{labels:cNames,datasets:[{data:cRev,backgroundColor:cDim,borderColor:cColors,borderWidth:1,borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return '$'+c.raw.toLocaleString();}}}},scales:{x:{grid:{color:gc},ticks:{color:'rgba(255,255,255,0.5)',font:{size:11}}},y:{grid:{color:gc},ticks:{color:tc,font:{size:9},callback:function(v){return '$'+(v/1000).toFixed(0)+'k';}}}}}});
+    charts.cCash = new Chart(document.getElementById('closerCashChart'),{type:'bar',data:{labels:cNames,datasets:[{data:cCash,backgroundColor:cDim,borderColor:cColors,borderWidth:1,borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return '$'+c.raw.toLocaleString();}}}},scales:{x:{grid:{color:gc},ticks:{color:'rgba(255,255,255,0.5)',font:{size:11}}},y:{grid:{color:gc},ticks:{color:tc,font:{size:9},callback:function(v){return '$'+(v/1000).toFixed(0)+'k';}}}}}});
+    charts.pie = new Chart(document.getElementById('revPieChart'),{type:'doughnut',data:{labels:closers.map(function(c){return c[0];}),datasets:[{data:cRev,backgroundColor:cDim,borderColor:cColors,borderWidth:2,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{position:'right',labels:{color:'rgba(255,255,255,0.75)',font:{size:11},padding:14,boxWidth:12,boxHeight:12}},tooltip:{callbacks:{label:function(c){return c.label+': $'+c.raw.toLocaleString();}}}}}});
   }
 }
 
-// ── INIT ──
+// Init
 document.addEventListener('DOMContentLoaded', function(){
-  document.getElementById('loading-text').textContent = 'Connecting to Google Sheet...';
-  fetchSheet(SHEET_URL)
-    .then(function(rows){
-      allRows = rows;
-      render();
-      document.getElementById('loading').style.display = 'none';
-      document.getElementById('app').style.display = 'block';
-    })
-    .catch(function(e){
-      document.getElementById('loading').innerHTML = '<div class="error-box"><strong>Could not load data</strong>' + e.message + '</div>';
-    });
+  fetchAllTabs().then(function(rows){
+    if (!rows.length) {
+      document.getElementById('loading').innerHTML = '<div class="error-box"><strong>Could not load data</strong>All tabs failed to load. Check your internet connection and try again.</div>';
+      return;
+    }
+    allRows = rows;
+    detectCols(rows);
+    render();
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+  }).catch(function(e){
+    document.getElementById('loading').innerHTML = '<div class="error-box"><strong>Error</strong>'+e.message+'</div>';
+  });
 });
 </script>
 </body>
