@@ -33,6 +33,30 @@ body{background:var(--bg);color:var(--t1);font-size:13px;line-height:1.5;min-hei
 .grid21{display:grid;grid-template-columns:2fr 1fr;gap:14px}
 @media(max-width:1000px){.grid4{grid-template-columns:1fr 1fr}.grid21{grid-template-columns:1fr}}
 @media(max-width:600px){.grid4{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}}
+
+@media(max-width:640px){
+  .topbar{padding:10px 14px;height:auto;flex-direction:column;align-items:flex-start;gap:8px}
+  .logo-wrap img{width:26px;height:26px}
+  .logo{font-size:16px}
+  .period-badge{font-size:10px;padding:4px 9px}
+  .range-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+  .range-btn{flex-shrink:0;font-size:11px;padding:5px 11px}
+  .topbar-r{margin-left:0;width:100%}
+  .main{padding:14px 12px;gap:14px}
+  .mcard{padding:13px 14px;min-height:90px}
+  .mval{font-size:21px}
+  .mlabel{font-size:9px}
+  .ccard{padding:14px 14px}
+  .ctitle{font-size:12px}
+  .thead2{padding:12px 14px 10px;font-size:12px}
+  .ct thead th{padding:7px 10px;font-size:8px}
+  .ct tbody td{padding:9px 10px;font-size:11px}
+  .ct tbody td:not(:first-child){font-size:10px}
+  .av{width:24px;height:24px;font-size:9px}
+  .cn{gap:7px}
+  canvas{max-width:100%}
+  .ccard > div[style*="position:relative"]{height:170px !important}
+}
 .mcard{background:var(--bg-card);border:1px solid var(--brd);border-radius:12px;padding:16px 18px;position:relative;overflow:hidden;min-height:110px;display:flex;flex-direction:column}
 .accent-bar{position:absolute;top:0;left:0;right:0;height:2px}
 .mlabel{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:8px}
@@ -43,7 +67,7 @@ body{background:var(--bg);color:var(--t1);font-size:13px;line-height:1.5;min-hei
 .ctitle span{font-size:10px;color:var(--t3);font-weight:400}
 .tcard{background:var(--bg-card);border:1px solid var(--brd);border-radius:12px;overflow:hidden}
 .thead2{padding:14px 18px 12px;border-bottom:1px solid var(--brd);font-size:13px;font-weight:600;color:var(--t1)}
-table.ct{width:100%;border-collapse:collapse}
+table.ct{width:100%;border-collapse:collapse;min-width:640px}
 .ct thead th{padding:9px 16px;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--grn);text-align:left;border-bottom:1px solid var(--brd);background:var(--bg-card2)}
 .ct thead th:not(:first-child){text-align:right}
 .ct tbody tr{border-bottom:1px solid rgba(255,255,255,0.04)}
@@ -415,7 +439,7 @@ function render() {
     '</div></div>' +
     '<div><div class="sec-label">Closer performance</div><div class="tcard"><div class="thead2">Individual closer breakdown</div><div style="overflow-x:auto"><table class="ct"><thead><tr><th>Closer</th><th>Cash Collected</th><th>Contract Value</th><th>Deals Won</th><th>Avg Cash / Deal</th><th>Avg Cash Collected</th></tr></thead><tbody>'+closerHTML+'</tbody></table></div></div></div>' +
     '<div class="grid21"><div class="ccard"><div class="ctitle">Cash collected by day <span>'+periodStr+'</span></div><div style="position:relative;height:190px"><canvas id="revChart"></canvas></div></div>' +
-    '<div class="ccard"><div class="ctitle">Product mix</div>'+productHTML+'<div class="ctitle" style="margin-top:18px;margin-bottom:10px">Deals set by setter</div>'+setterHTML+'</div></div>' +
+    '<div class="ccard"><div class="ctitle">Product mix</div>'+productHTML+'<div class="ctitle" style="margin-top:18px;margin-bottom:10px">Closed deals set by setter</div>'+setterHTML+'</div></div>' +
     '<div class="grid2"><div class="ccard"><div class="ctitle">Revenue by closer</div><div style="position:relative;height:200px"><canvas id="closerRevChart"></canvas></div></div><div class="ccard"><div class="ctitle">Cash collected by closer</div><div style="position:relative;height:200px"><canvas id="closerCashChart"></canvas></div></div></div>' +
     '<div class="ccard"><div class="ctitle">Signed revenue distribution by closer</div><div style="position:relative;height:240px"><canvas id="revPieChart"></canvas></div></div>';
 
