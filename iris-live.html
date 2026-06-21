@@ -427,7 +427,7 @@ function render() {
   var closerHTML = closers.map(function(c,i){
     var col = CLOSER_COLORS[i%CLOSER_COLORS.length];
     var avg = c[1].deals>0 ? c[1].cash/c[1].deals : 0;
-    return '<tr><td><div class="cn"><div class="av" style="background:'+col+'22;color:'+col+'">'+c[0].charAt(0)+'</div>'+c[0]+'</div></td><td style="color:#fff;font-weight:600">'+fmt$(c[1].cash)+'</td><td>'+fmt$(c[1].contract)+'</td><td>'+c[1].deals+'</td><td>'+fmt$(avg)+'</td><td>'+fmt$(avg)+'</td></tr>';
+    return '<tr><td><div class="cn"><div class="av" style="background:'+col+'22;color:'+col+'">'+c[0].charAt(0)+'</div>'+c[0]+'</div></td><td>'+fmt$(c[1].contract)+'</td><td style="color:#fff;font-weight:600">'+fmt$(c[1].cash)+'</td><td>'+c[1].deals+'</td><td>'+fmt$(avg)+'</td><td>'+fmt$(avg)+'</td></tr>';
   }).join('') || '<tr><td colspan="6" style="text-align:center;color:rgba(255,255,255,0.3);padding:20px">No data for this period</td></tr>';
 
   document.getElementById('main-content').innerHTML =
@@ -437,7 +437,7 @@ function render() {
     '<div class="mcard"><div class="accent-bar" style="background:var(--blu)"></div><div class="mlabel">Deals Closed</div><div class="mval" style="color:var(--blu)">'+deals+'</div></div>' +
     '<div class="mcard"><div class="accent-bar" style="background:var(--amb)"></div><div class="mlabel">Avg Cash / Deal</div><div class="mval" style="color:var(--amb)">'+fmt$(avgCash)+'</div><div class="msub">Cash divided by deals</div></div>' +
     '</div></div>' +
-    '<div><div class="sec-label">Closer performance</div><div class="tcard"><div class="thead2">Individual closer breakdown</div><div style="overflow-x:auto"><table class="ct"><thead><tr><th>Closer</th><th>Cash Collected</th><th>Contract Value</th><th>Deals Won</th><th>Avg Cash / Deal</th><th>Avg Cash Collected</th></tr></thead><tbody>'+closerHTML+'</tbody></table></div></div></div>' +
+    '<div><div class="sec-label">Sales Leaderboard</div><div class="tcard"><div class="thead2">Individual closer breakdown</div><div style="overflow-x:auto"><table class="ct"><thead><tr><th>Closer</th><th>Revenue</th><th>Cash Collected</th><th>Deals Won</th><th>Avg Cash / Deal</th><th>Avg Cash Collected</th></tr></thead><tbody>'+closerHTML+'</tbody></table></div></div></div>' +
     '<div class="grid21"><div class="ccard"><div class="ctitle">Cash collected by day <span>'+periodStr+'</span></div><div style="position:relative;height:190px"><canvas id="revChart"></canvas></div></div>' +
     '<div class="ccard"><div class="ctitle">Product mix</div>'+productHTML+'<div class="ctitle" style="margin-top:18px;margin-bottom:10px">Closed deals set by setter</div>'+setterHTML+'</div></div>' +
     '<div class="grid2"><div class="ccard"><div class="ctitle">Revenue by closer</div><div style="position:relative;height:200px"><canvas id="closerRevChart"></canvas></div></div><div class="ccard"><div class="ctitle">Cash collected by closer</div><div style="position:relative;height:200px"><canvas id="closerCashChart"></canvas></div></div></div>' +
