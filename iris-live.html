@@ -104,7 +104,6 @@ table.ct{width:100%;border-collapse:collapse}
       <button class="range-btn" onclick="setRange(this,'all')">All</button>
     </div>
     <div class="topbar-r">
-      <span class="cap-label">capitalism.com</span>
     </div>
   </div>
   <div class="main" id="main-content"></div>
@@ -409,9 +408,9 @@ function render() {
 
   document.getElementById('main-content').innerHTML =
     '<div><div class="sec-label">Revenue &amp; cash</div><div class="grid4">' +
+    '<div class="mcard"><div class="accent-bar" style="background:var(--tel)"></div><div class="mlabel">Revenue</div><div class="mval" style="color:var(--tel)">'+fmt$(totalContract)+'</div></div>' +
     '<div class="mcard"><div class="accent-bar" style="background:var(--grn)"></div><div class="mlabel">Cash Collected</div><div class="mval" style="color:var(--grn)">'+fmt$(totalCash)+'</div><div class="msub">'+deals+' deals</div></div>' +
-    '<div class="mcard"><div class="accent-bar" style="background:var(--tel)"></div><div class="mlabel">Contract Value</div><div class="mval" style="color:var(--tel)">'+fmt$(totalContract)+'</div><div class="msub">Full program values</div></div>' +
-    '<div class="mcard"><div class="accent-bar" style="background:var(--blu)"></div><div class="mlabel">Deals Closed</div><div class="mval" style="color:var(--blu)">'+deals+'</div><div class="msub">Cash &gt; $0</div></div>' +
+    '<div class="mcard"><div class="accent-bar" style="background:var(--blu)"></div><div class="mlabel">Deals Closed</div><div class="mval" style="color:var(--blu)">'+deals+'</div></div>' +
     '<div class="mcard"><div class="accent-bar" style="background:var(--amb)"></div><div class="mlabel">Avg Cash / Deal</div><div class="mval" style="color:var(--amb)">'+fmt$(avgCash)+'</div><div class="msub">Cash divided by deals</div></div>' +
     '</div></div>' +
     '<div><div class="sec-label">Closer performance</div><div class="tcard"><div class="thead2">Individual closer breakdown</div><div style="overflow-x:auto"><table class="ct"><thead><tr><th>Closer</th><th>Cash Collected</th><th>Contract Value</th><th>Deals Won</th><th>Avg Cash / Deal</th><th>Avg Cash Collected</th></tr></thead><tbody>'+closerHTML+'</tbody></table></div></div></div>' +
