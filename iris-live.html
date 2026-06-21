@@ -136,9 +136,11 @@ function norm(k) {
 // Find the right column key from a row
 function findColKey(sampleRow, terms) {
   var keys = Object.keys(sampleRow);
-  for (var i=0; i<keys.length; i++) {
-    var n = norm(keys[i]);
-    for (var j=0; j<terms.length; j++) {
+  // Prioritize by term order first (most specific/intended term wins),
+  // then by column order within that term.
+  for (var j=0; j<terms.length; j++) {
+    for (var i=0; i<keys.length; i++) {
+      var n = norm(keys[i]);
       if (n.indexOf(terms[j]) > -1) return keys[i];
     }
   }
@@ -305,7 +307,7 @@ function detectCols(rows) {
   COLS.contract = findColKey(sample, ['revenue']) || 'Revenue';
   COLS.product = findColKey(sample, ['top','inc','product']) || 'TOP/INC';
   COLS.setter = findColKey(sample, ['setter']) || 'Setter';
-  COLS.closer = findColKey(sample, ['closer','sales person','sales member','sales']) || 'Sales';
+  COLS.closer = findColKey(sample, ['closer','sales person']) || 'Sales Person/ Closer';
   console.log('Final COLS:', JSON.stringify(COLS));
   console.log('Sample row keys:', JSON.stringify(Object.keys(sample)));
   console.log('COLS detected:', COLS);
