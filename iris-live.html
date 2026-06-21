@@ -276,11 +276,14 @@ function fmt$(n) { return '$' + Math.round(n).toLocaleString(); }
 var COLS = {};
 function detectCols(rows) {
   if (!rows.length) return;
-  // Find a row that has Cash Collected column
-  var sample = rows.find(function(r){
-    return Object.keys(r).some(function(k){ return k.toLowerCase().indexOf('cash')>-1; });
-  }) || rows[0];
-  COLS.date = findColKey(sample, ['date']) || 'Date';
+  // Find the row with the MOST columns (most complete schema)
+  var sample = rows[0];
+  var maxKeys = Object.keys(sample).length;
+  rows.forEach(function(r){
+    var n = Object.keys(r).length;
+    if (n > maxKeys) { maxKeys = n; sample = r; }
+  });
+  COLS.date = findColKey(sample, ['date','d']) || 'Date';
   COLS.cash = findColKey(sample, ['cash']) || 'Cash';
   COLS.contract = findColKey(sample, ['revenue']) || 'Revenue';
   COLS.product = findColKey(sample, ['top','inc','product']) || 'TOP/INC';
