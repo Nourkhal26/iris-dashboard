@@ -147,31 +147,48 @@ function findColKey(sampleRow, terms) {
 
 // Parse CSV text into array of objects
 function parseCSV(text) {
-  var lines = text.trim().split('\n');
-  if (lines.length < 2) return [];
-  var headers = lines[0].split(',').map(function(h){ return h.replace(/^"|"$/g,'').trim(); });
+  // Split into logical CSV rows first, respecting quoted newlines/commas
+  var allLines = splitCSVRecords(text);
+  if (allLines.length < 2) return [];
+  var headers = allLines[0].map(function(h){ return h.replace(/[\r\n]+/g,' ').replace(/\s+/g,' ').trim(); });
   var rows = [];
-  for (var i=1; i<lines.length; i++) {
-    var vals = splitCSVLine(lines[i]);
+  for (var i=1; i<allLines.length; i++) {
+    var vals = allLines[i];
     var obj = {};
     headers.forEach(function(h, idx) {
-      obj[h] = (vals[idx]||'').replace(/^"|"$/g,'').trim();
+      obj[h] = (vals[idx]||'').trim();
     });
-    // Only include rows with a date
     if (obj[headers[0]] && obj[headers[0]].match(/\d/)) rows.push(obj);
   }
   return rows;
 }
 
-function splitCSVLine(line) {
-  var result = [], current = '', inQuotes = false;
-  for (var i=0; i<line.length; i++) {
-    if (line[i] === '"') { inQuotes = !inQuotes; }
-    else if (line[i] === ',' && !inQuotes) { result.push(current); current = ''; }
-    else { current += line[i]; }
+// Splits full CSV text into an array of records, each an array of fields.
+// Properly handles quoted fields that contain commas or embedded newlines.
+function splitCSVRecords(text) {
+  var records = [];
+  var row = [];
+  var field = '';
+  var inQuotes = false;
+  for (var i = 0; i < text.length; i++) {
+    var c = text[i];
+    if (inQuotes) {
+      if (c === '"') {
+        if (text[i+1] === '"') { field += '"'; i++; }
+        else { inQuotes = false; }
+      } else {
+        field += c;
+      }
+    } else {
+      if (c === '"') { inQuotes = true; }
+      else if (c === ',') { row.push(field); field = ''; }
+      else if (c === '\r') { /* skip */ }
+      else if (c === '\n') { row.push(field); field=''; records.push(row); row=[]; }
+      else { field += c; }
+    }
   }
-  result.push(current);
-  return result;
+  if (field.length || row.length) { row.push(field); records.push(row); }
+  return records.filter(function(r){ return r.length>1 || (r[0] && r[0].trim()); });
 }
 
 // Fetch one tab via Cloudflare Worker
