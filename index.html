@@ -456,15 +456,27 @@ function detectCols(rows){
   COLS.product = findColKey(sample,['top/inc','product','program'])||'TOP/INC';
   COLS.setter  = findColKey(sample,['setter'])||'Setter';
   COLS.closer  = findColKey(sample,['closer','sales person'])||'Closer';
+  console.log('COLS detected:', JSON.stringify(COLS));
+  console.log('Total rows loaded:', rows.length);
+  console.log('Sample row:', JSON.stringify(sample));
+  // Log first few date values
+  var dates = rows.slice(0,5).map(function(r){ return r[COLS.date]; });
+  console.log('First 5 dates:', dates);
+  var cashVals = rows.slice(0,5).map(function(r){ return r[COLS.cash]; });
+  console.log('First 5 cash values:', cashVals);
 }
 
 // ─── FILTER ────────────────────────────────────────────────────────────────
 function filteredRows(){
+  // Strip time from comparison dates so we compare date-only
+  var from = dateFrom ? new Date(dateFrom.getFullYear(), dateFrom.getMonth(), dateFrom.getDate()) : null;
+  var to   = dateTo   ? new Date(dateTo.getFullYear(),   dateTo.getMonth(),   dateTo.getDate()+1) : null;
   return allRows.filter(function(r){
     var d = parseDate(r[COLS.date]);
     if(!d) return false;
-    if(dateFrom && d < dateFrom) return false;
-    if(dateTo   && d > dateTo)   return false;
+    var day = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    if(from && day < from) return false;
+    if(to   && day >= to)  return false;
     return true;
   });
 }
