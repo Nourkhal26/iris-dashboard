@@ -372,11 +372,10 @@ function parseDate(s){
 function setDefault(){
   // Default to full year Jan 1 → Dec 31 so all data shows on load
   var y = new Date().getFullYear();
-  var first = new Date(y,0,1);
-  var last  = new Date(y,11,31);
-  document.getElementById('dateFrom').value = first.toISOString().slice(0,10);
-  document.getElementById('dateTo').value   = last.toISOString().slice(0,10);
-  dateFrom = first; dateTo = last;
+  dateFrom = new Date(y,0,1);
+  dateTo   = new Date(y,11,31);
+  document.getElementById('dateFrom').value = y+'-01-01';
+  document.getElementById('dateTo').value   = y+'-12-31';
 }
 
 function applyDateRange(){
@@ -566,7 +565,7 @@ function renderBooking(){
 function renderGrowthChart(rows){
   var monthly={};
   var MONTH_NAMES=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  allRows.forEach(function(r){
+  rows.forEach(function(r){
     var d=parseDate(r[COLS.date]); if(!d) return;
     var mo=d.getMonth(); // 0-11
     var c=parseMoney(r[COLS.cash]); if(c>0) monthly[mo]=(monthly[mo]||0)+c;
