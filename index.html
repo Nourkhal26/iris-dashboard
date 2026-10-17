@@ -357,6 +357,11 @@ function parseDate(s){
     var y = parseInt(m[3]); if(y<100) y+=2000;
     return new Date(y, parseInt(m[1])-1, parseInt(m[2]));
   }
+  // Try M/D with no year — assume current year
+  m = clean.match(/^(\d{1,2})\/(\d{1,2})$/);
+  if(m){
+    return new Date(new Date().getFullYear(), parseInt(m[1])-1, parseInt(m[2]));
+  }
   // Try YYYY-MM-DD
   m = clean.match(/^(\d{4})-(\d{2})-(\d{2})/);
   if(m) return new Date(parseInt(m[1]),parseInt(m[2])-1,parseInt(m[3]));
@@ -564,11 +569,12 @@ function renderGrowthChart(rows){
   var MONTH_NAMES=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   allRows.forEach(function(r){
     var d=parseDate(r[COLS.date]); if(!d) return;
-    var k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    // Use tab name to infer year if date has no year info
+    var k=String(d.getMonth()+1).padStart(2,'0'); // just month as key since all same year
     var c=parseMoney(r[COLS.cash]); if(c>0) monthly[k]=(monthly[k]||0)+c;
   });
   var keys=Object.keys(monthly).sort();
-  var labels=keys.map(function(k){var p=k.split('-');return MONTH_NAMES[parseInt(p[1])-1]+' '+p[0].slice(2);});
+  var labels=keys.map(function(k){return MONTH_NAMES[parseInt(k)-1];});
 
   destroyChart('growthChart');
   var ctx=document.getElementById('growthChart').getContext('2d');
