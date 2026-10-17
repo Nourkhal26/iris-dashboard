@@ -370,10 +370,10 @@ function parseDate(s){
 }
 
 function setDefault(){
-  var now = new Date();
-  var y = now.getFullYear(), mo = now.getMonth();
-  var first = new Date(y,mo,1);
-  var last  = new Date(y,mo+1,0);
+  // Default to full year Jan 1 → Dec 31 so all data shows on load
+  var y = new Date().getFullYear();
+  var first = new Date(y,0,1);
+  var last  = new Date(y,11,31);
   document.getElementById('dateFrom').value = first.toISOString().slice(0,10);
   document.getElementById('dateTo').value   = last.toISOString().slice(0,10);
   dateFrom = first; dateTo = last;
@@ -564,17 +564,15 @@ function renderBooking(){
 }
 
 function renderGrowthChart(rows){
-  // Monthly totals across ALL rows (not just filtered)
   var monthly={};
   var MONTH_NAMES=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   allRows.forEach(function(r){
     var d=parseDate(r[COLS.date]); if(!d) return;
-    // Use tab name to infer year if date has no year info
-    var k=String(d.getMonth()+1).padStart(2,'0'); // just month as key since all same year
-    var c=parseMoney(r[COLS.cash]); if(c>0) monthly[k]=(monthly[k]||0)+c;
+    var mo=d.getMonth(); // 0-11
+    var c=parseMoney(r[COLS.cash]); if(c>0) monthly[mo]=(monthly[mo]||0)+c;
   });
-  var keys=Object.keys(monthly).sort();
-  var labels=keys.map(function(k){return MONTH_NAMES[parseInt(k)-1];});
+  var keys=Object.keys(monthly).map(Number).sort(function(a,b){return a-b;});
+  var labels=keys.map(function(k){return MONTH_NAMES[k];});
 
   destroyChart('growthChart');
   var ctx=document.getElementById('growthChart').getContext('2d');
