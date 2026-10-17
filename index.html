@@ -462,12 +462,19 @@ function detectCols(rows){
   COLS.closer  = findColKey(sample,['closer','sales person'])||'Closer';
   console.log('COLS detected:', JSON.stringify(COLS));
   console.log('Total rows loaded:', rows.length);
-  console.log('Sample row:', JSON.stringify(sample));
-  // Log first few date values
-  var dates = rows.slice(0,5).map(function(r){ return r[COLS.date]; });
-  console.log('First 5 dates:', dates);
-  var cashVals = rows.slice(0,5).map(function(r){ return r[COLS.cash]; });
-  console.log('First 5 cash values:', cashVals);
+  // Count rows per month prefix to see data distribution
+  var monthCounts={};
+  rows.forEach(function(r){
+    var raw=String(r[COLS.date]||'').trim();
+    var prefix=raw.split('/')[0]||'empty';
+    monthCounts[prefix]=(monthCounts[prefix]||0)+1;
+  });
+  console.log('Row count by month number prefix:', JSON.stringify(monthCounts));
+  // Sample dates from start, middle, end
+  console.log('First 5 dates:', JSON.stringify(rows.slice(0,5).map(function(r){return r[COLS.date];})));
+  var mid=Math.floor(rows.length/2);
+  console.log('Middle 5 dates:', JSON.stringify(rows.slice(mid,mid+5).map(function(r){return r[COLS.date];})));
+  console.log('Last 5 dates:', JSON.stringify(rows.slice(-5).map(function(r){return r[COLS.date];})));
 }
 
 // ─── FILTER ────────────────────────────────────────────────────────────────
@@ -570,6 +577,11 @@ function renderGrowthChart(rows){
     var mo=d.getMonth(); // 0-11
     var c=parseMoney(r[COLS.cash]); if(c>0) monthly[mo]=(monthly[mo]||0)+c;
   });
+  console.log('Growth chart monthly data:', JSON.stringify(monthly));
+  console.log('Growth chart rows count:', rows.length);
+  // Log a sample of date values from rows
+  var sampleDates = rows.slice(0,10).map(function(r){ return r[COLS.date]; });
+  console.log('Growth chart sample dates:', sampleDates);
   var keys=Object.keys(monthly).map(Number).sort(function(a,b){return a-b;});
   var labels=keys.map(function(k){return MONTH_NAMES[k];});
 
