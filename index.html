@@ -552,10 +552,10 @@ function parseDate(s){
     var y = parseInt(m[3]); if(y<100) y+=2000;
     return new Date(y, parseInt(m[1])-1, parseInt(m[2]));
   }
-  // Try M/D with no year — assume current year
+  // Try M/D with no year — assume 2026 (all our data is 2026)
   m = clean.match(/^(\d{1,2})\/(\d{1,2})$/);
   if(m){
-    return new Date(new Date().getFullYear(), parseInt(m[1])-1, parseInt(m[2]));
+    return new Date(2026, parseInt(m[1])-1, parseInt(m[2]));
   }
   // Try YYYY-MM-DD
   m = clean.match(/^(\d{4})-(\d{2})-(\d{2})/);
@@ -565,12 +565,11 @@ function parseDate(s){
 }
 
 function setDefault(){
-  // Default to full year Jan 1 → Dec 31 so all data shows on load
-  var y = new Date().getFullYear();
-  dateFrom = new Date(y,0,1);
-  dateTo   = new Date(y,11,31);
-  document.getElementById('dateFrom').value = y+'-01-01';
-  document.getElementById('dateTo').value   = y+'-12-31';
+  // Default to Jan 1 – Oct 31 2026 (full range of embedded data)
+  dateFrom = new Date(2026,0,1);
+  dateTo   = new Date(2026,9,31);
+  document.getElementById('dateFrom').value = '2026-01-01';
+  document.getElementById('dateTo').value   = '2026-10-31';
 }
 
 function applyDateRange(){
