@@ -863,7 +863,8 @@ function applyDateRange(){
   var t = document.getElementById('dateTo').value;
   if(f) dateFrom = parseDate(f) || new Date(f+'T00:00:00');
   if(t){ var td = parseDate(t); if(td){ dateTo = new Date(td.getFullYear(),td.getMonth(),td.getDate(),23,59,59); } else { dateTo = new Date(t+'T23:59:59'); } }
-  render();
+  // Re-fetch Close CRM data for the new date range, then render
+  refreshClose().then(function(cd){ closeData = cd; render(); }).catch(function(){ render(); });
 }
 
 // ─── LOAD EMBEDDED DATA ────────────────────────────────────────────────────
@@ -884,7 +885,13 @@ function loadEmbeddedData(){
 
 async function refreshClose(){
   try{
-    var r = await fetch(CLOSE_WORKER);
+    // Pass date range to worker so it filters by date_created
+    var params = '';
+    if(dateFrom && dateTo){
+      function toISO(dt){ return dt.getFullYear()+'-'+('0'+(dt.getMonth()+1)).slice(-2)+'-'+('0'+dt.getDate()).slice(-2); }
+      params = '?date_from='+toISO(dateFrom)+'&date_to='+toISO(dateTo);
+    }
+    var r = await fetch(CLOSE_WORKER + params);
     if(!r.ok) return null;
     var d = await r.json();
     return d;
