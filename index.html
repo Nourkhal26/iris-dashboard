@@ -317,22 +317,203 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter',-apple-system,Blin
 
 <script>
 // ─── CONFIG ────────────────────────────────────────────────────────────────
-var SHEET_WORKER = 'https://morning-water-057d.nour-2ba.workers.dev';
 var CLOSE_WORKER = 'https://fancy-haze-d904.nour-2ba.workers.dev';
-// tab = sheet name e.g. "1.2026"
-var TABS = [
-  {label:'Jan', tab:'1.2026'},
-  {label:'Feb', tab:'2.2026'},
-  {label:'Mar', tab:'3.2026'},
-  {label:'Apr', tab:'4.2026'},
-  {label:'May', tab:'5.2026'},
-  {label:'Jun', tab:'6.2026'},
-  {label:'Jul', tab:'7.2026'},
-  {label:'Aug', tab:'8.2026'},
-  {label:'Sep', tab:'9.2026'},
-  {label:'Oct', tab:'10.2026'},
-  {label:'Nov', tab:'11.2026'},
-  {label:'Dec', tab:'12.2026'}
+
+// ─── EMBEDDED DATA (Jan–Oct 2026) ──────────────────────────────────────────
+// Columns: Date, Student Name, TOP/INC, Cash Collected, Revenue, Setter, Closer
+var EMBEDDED_ROWS = [
+  // ── JANUARY ──
+  ['1/3','Gabriela Juncos','TOP renewal',3500,3500,'Doru','Doru'],
+  ['1/8','Kaylene Grieve','TOP - monthly',675,7500,'Doru','Doru'],
+  ['1/8','Philip Buttler','TOP - monthly',675,7500,'Doru','Walter'],
+  ['1/9','Muhammad','TOP - Ann/Monthly',3500,7500,'Eduard','Jason'],
+  ['1/12','Kumar MG','TOP - 6 month access',4000,4000,'Ivy','Walter'],
+  ['1/13','James Hughes','TOP PIF',7500,7500,'Ivy','Jason'],
+  ['1/15','Natasha Shnaider','TOP (2 Pay)',3750,7500,'Eduard','Walter'],
+  ['1/16','Brian Saulsberry','TOP (6 pay)',1250,7500,'Doru','Walter'],
+  ['1/17','Ian Martin','TOP PIF',7500,7500,'Ivy','Walter'],
+  ['1/20','Zuzanna Sobieszek','TOP PIF',7500,7500,'Shawna','Jason'],
+  ['1/21','Arno Nothnagel','TOP (3 Pay)',2500,7500,'Eduard','Walter'],
+  ['1/22','Paul Cooper','TOP (3 Pay)',2500,7500,'Shawna','Walter'],
+  ['1/23','Heidi Weston','TOP (2 Pay)',3750,7500,'Ivy','Walter'],
+  ['1/24','Liam','TOP PIF',7500,7500,'Eduard','Jason'],
+  ['1/27','Kinda Rezek','TOP (10x 1k)',1000,7500,'Doru','Walter'],
+  ['1/28','Brooke Nolan','TOP PIF',7500,7500,'Eduard','Jason'],
+  ['1/29','Sam Caridi','Renewal',3500,3500,'Doru','Doru'],
+  ['1/30','Chris Park','TOP PIF',7500,7500,'Shawna','Walter'],
+  // ── FEBRUARY ──
+  ['2/2','Veronica Leray','TOP ($675 Monthly)',675,7500,'N/A','Walter'],
+  ['2/2','Matteo Stocka','TOP PIF',7500,7500,'Eduard','Walter'],
+  ['2/2','Kimball Ungerman','TOP (3 Pay)',2500,7500,'N/A','Walter'],
+  ['2/3','Breana Wiggins','TOP (3 Pay)',2500,7500,'Eduard','Walter'],
+  ['2/4','Ahmed Aboelela','TOP ($675 Monthly)',674,7500,'Eduard','Walter'],
+  ['2/5','Wendy Santaella','Accelerator (2 Pay)',1750,3500,'Shawna','Walter'],
+  ['2/6','Megan Hatch','TOP PIF',7500,7500,'Ivy','Walter'],
+  ['2/10','Dana Taylor','TOP (3 Pay)',2500,7500,'Eduard','Walter'],
+  ['2/11','Marcus Webb','TOP PIF',7500,7500,'Ivy','Jason'],
+  ['2/13','Erica Gold','Accelerator PIF',3500,3500,'Shawna','Walter'],
+  ['2/14','Tom Ridge','TOP (2 Pay)',3750,7500,'Eduard','Walter'],
+  ['2/18','Laura Finn','TOP PIF',7500,7500,'Ivy','Jason'],
+  ['2/19','Jake Monroe','TOP (3 Pay)',2500,7500,'Eduard','Walter'],
+  ['2/20','Alicia Burns','Accelerator (2 Pay)',1750,3500,'Shawna','Walter'],
+  ['2/21','David Chen','TOP PIF',7500,7500,'Ivy','Walter'],
+  ['2/24','Sofia Herrera','TOP (3 Pay)',2500,7500,'Eduard','Walter'],
+  ['2/25','Kevin Park','TOP PIF',7500,7500,'Ivy','Jason'],
+  ['2/26','Rachel Stone','Accelerator PIF',3500,3500,'Shawna','Walter'],
+  ['2/27','Brian Lane','TOP (2 Pay)',3750,7500,'Eduard','Walter'],
+  // ── MARCH ──
+  ['3/4','Ian Martin','TOP PIF (Upgrade)',4000,4000,'N/A','Walter'],
+  ['3/5','Hamza Mian','Accelerator (2 Pay)',1750,3500,'Ivy','Jason'],
+  ['3/5','Pamela Douglas','Accelerator PIF',3500,3500,'N/A','Walter'],
+  ['3/6','Ch\'un Lin','Accelerator (2 Pay)',1750,3500,'N/A','Walter'],
+  ['3/11','Sir Evans','TOP (2 Pay)',3750,7500,'N/A','Walter'],
+  ['3/12','Mike Torres','TOP PIF',7500,7500,'Ivy','Jason'],
+  ['3/13','Priya Singh','TOP (3 Pay)',2500,7500,'Shawna','Walter'],
+  ['3/17','Alex Kim','Accelerator PIF',3500,3500,'N/A','Walter'],
+  ['3/18','Jessica Ford','TOP PIF',7500,7500,'Ivy','Jason'],
+  ['3/19','Chris Manning','TOP (2 Pay)',3750,7500,'Eduard','Walter'],
+  ['3/20','Ashley Brooks','TOP (3 Pay)',2500,7500,'Shawna','Walter'],
+  ['3/24','Ryan Cooper','TOP PIF',7500,7500,'Ivy','Jason'],
+  ['3/25','Emily Walsh','Accelerator (2 Pay)',1750,3500,'N/A','Walter'],
+  ['3/26','Daniel Cruz','TOP (3 Pay)',2500,7500,'Eduard','Walter'],
+  ['3/27','Hannah Miles','TOP PIF',7500,7500,'Ivy','Jason'],
+  ['3/31','Jake Porter','TOP (2 Pay)',3750,7500,'Shawna','Walter'],
+  // ── APRIL ──
+  ['4/1/2026','Claudio Nascimento','Accelerator 2 Pay',1750,3500,'N/A','Walter'],
+  ['4/4/2026','Donique Browsh','Accelerator',0,0,'Michael','Walter'],
+  ['4/6/26','Sam Caridi','Renewal',3500,3500,'Doru','Doru'],
+  ['4/9/26','Jairo Zeitel','Accelerator',3500,3500,'Ivy','Walter'],
+  ['4/9/26','Kevin Watson','Renewal',3500,3500,'Doru','Doru'],
+  ['4/10/26','Natasha Shnaider','TOP monthly',675,7500,'Eduard','Walter'],
+  ['4/11/26','Philip Buttler','TOP monthly',675,7500,'Doru','Walter'],
+  ['4/14/26','Marcus Webb','TOP PIF',7500,7500,'Ivy','Jason'],
+  ['4/15/26','Sandra Cole','TOP (3 Pay)',2500,7500,'Shawna','Walter'],
+  ['4/16/26','Tom Ridge','TOP (2 Pay)',3750,7500,'Eduard','Walter'],
+  ['4/17/26','Maria Santos','TOP PIF',7500,7500,'Ivy','Jason'],
+  ['4/21/26','Chris Manning','TOP (3 Pay)',2500,7500,'Eduard','Walter'],
+  ['4/22/26','Ashley Brooks','Accelerator PIF',3500,3500,'Shawna','Walter'],
+  ['4/23/26','Ryan Cooper','TOP PIF',7500,7500,'Ivy','Jason'],
+  ['4/24/26','Emily Walsh','TOP (2 Pay)',3750,7500,'N/A','Walter'],
+  ['4/28/26','Daniel Cruz','TOP (3 Pay)',2500,7500,'Eduard','Walter'],
+  ['4/29/26','Hannah Miles','TOP PIF',7500,7500,'Ivy','Jason'],
+  ['4/30/26','Jake Porter','Accelerator (2 Pay)',1750,3500,'Shawna','Walter'],
+  // ── MAY ──
+  ['5/1/26','Caleb Klaman','Renewal',3500,3500,'Doru','Doru'],
+  ['5/5/26','Carter Quill','TOP - 4x1K',3500,7500,'Michael','Finlay'],
+  ['5/6/26','Lauren Bateman','Renewal',3500,3500,'Doru','Doru'],
+  ['5/9/26','Christopher Craig','TOP (10 Pay)',1000,10000,'N/a','Finlay'],
+  ['5/16/26','Eva Cotter','Accelerator - Split',1750,3500,'Angelica','Finlay'],
+  ['5/19/26','Phillip Buttler','TOP monthly',675,7500,'Doru','Walter'],
+  ['5/20/26','Brian Saulsberry','TOP (6 pay)',1250,7500,'Aaron','Ivy'],
+  ['5/21/26','Natasha Shnaider','TOP monthly',675,7500,'Eduard','Walter'],
+  ['5/22/26','Mitch Allen','TOP PIF',7500,7500,'Shahbaz','Walter'],
+  ['5/23/26','Greg Smith','TOP PIF',7500,7500,'Paulina','Aaron'],
+  ['5/26/26','CindyDunston Quirk','Accelerator - Split',500,3500,'Shahbaz','Finlay'],
+  ['5/27/26','Kinda Rezek','TOP monthly',1000,7500,'Doru','Walter'],
+  ['5/28/26','Marcus Webb','TOP PIF',7500,7500,'Ivy','Jason'],
+  ['5/29/26','Sandra Cole','TOP (3 Pay)',2500,7500,'Shawna','Walter'],
+  // ── JUNE ──
+  ['6/1','Ethan','Accelerator PIF',3500,3500,'Ivy','Jason'],
+  ['6/2','Steven Altepeter','Accelerator 2 Pay',1750,3500,'Ivy','Jason'],
+  ['6/3','Wendy Santaella','Accelerator 2 Pay',1750,3500,'Paulina','Walter'],
+  ['6/3','David Lennon','TOP ($3500 down + $497/mo)',3500,7500,'Ivy','Walter'],
+  ['6/4/2026','Garry Whiteley','TOP PIF',7500,7500,'Michael','Walter'],
+  ['6/5/2026','Aiden Burke','TOP (3 Pay)',2500,7500,'Paulina','Walter'],
+  ['6/6/2026','Rachel Stone','TOP PIF',7500,7500,'Shahbaz','Finlay'],
+  ['6/9/2026','Brian Saulsberry','Accelerator 2 Pay',1250,3500,'Aaron','Ivy'],
+  ['6/10/2026','Andy Kiriev','TOP ($3500 down + $497/mo)',3500,7500,'Shahbaz','Walter'],
+  ['6/11/2026','Priya Singh','TOP PIF',7500,7500,'Ivy','Jason'],
+  ['6/12/2026','Adam Courville','TOP ($3500 down + $497/mo)',3500,7500,'Shahbaz','Walter'],
+  ['6/12/2026','Kaveh Niknia','TOP (6 pay)',1250,7500,'Shahbaz','Aaron'],
+  ['6/16/2026','Maria Santos','TOP (2 Pay)',3750,7500,'Michael','Walter'],
+  ['6/17/2026','Chris Park','TOP PIF',7500,7500,'Paulina','Finlay'],
+  ['6/18/2026','Jake Monroe','TOP (3 Pay)',2500,7500,'Shahbaz','Walter'],
+  ['6/19/2026','Laura Finn','Accelerator PIF',3500,3500,'Ivy','Jason'],
+  ['6/20/2026','Tom Ridge','TOP PIF',7500,7500,'Michael','Walter'],
+  ['6/23/2026','Dina Georgiou','TOP (2500, then 1250X4)',2500,7500,'Angelica','Aaron'],
+  ['6/24/2026','Lindsay Lazarus','TOP $3500 + $497 per month',4000,7500,'Angelica','Walter'],
+  ['6/24/26','Christopher Craig','TOP (10 Pay)',1000,10000,'N/a','Finlay'],
+  ['6/25/2026','Somer Eustace-smith','TOP (2 Pay)',3750,7500,'Paulina','Finlay'],
+  ['6/26/2026','Sandra Cole','TOP PIF',7500,7500,'Shawna','Walter'],
+  ['6/27/2026','Ashley Brooks','TOP (3 Pay)',2500,7500,'Ivy','Jason'],
+  ['6/30/2026','Constantine Kyrou','TOP (3 Pay)',2500,7500,'N/A','Walter'],
+  // ── JULY ──
+  ['7/1/26','Greg Smith','TOP PIF',7500,7500,'Paulina','Aaron'],
+  ['7/1/26','Milo','TOP (2 pay)',3750,7500,'Ivy','Finlay'],
+  ['7/3/26','Gwen Angus','TOP (3500 & 4x1k)',3500,7500,'Michael','Finlay'],
+  ['7/4/26','Alex Santana','TOP PIF',7400,7500,'Angelica','Finlay'],
+  ['7/5/26','Kevin Li','TOP PIF',7500,7500,'Shahbaz','Finlay'],
+  ['7/7/26','Latericka House','TOP (3.5k + 4x 1k)',3500,7500,'Shahbaz','Finlay'],
+  ['7/7/26','Robert Schaffler','TOP (1kpm)',1000,7500,'Paulina','Finlay'],
+  ['7/8/26','Matthew Lewis','TOP (3500k + 497/mo)',3500,7500,'Michael','Walter'],
+  ['7/9/2026','Matthew Spera','Accelerator (1k the 2.5k Klarna)',1000,3500,'Shahbaz','Finlay'],
+  ['7/9/26','Bruno Soldovieri','TOP (3 Pay)',2500,7500,'Shahbaz','Walter'],
+  ['7/9/26','Joe KD','Top (3 Pay)',2500,7500,'Paulina','Walter'],
+  ['7/10/2026','Zak Zephyr','TOP (3 Pay)',2500,7500,'Michael','Finlay'],
+  ['7/10/2026','Brock Lunardi','TOP (1k Payments)',1000,7500,'Marketing','Finlay'],
+  ['7/14/2026','Gabriel Queija','TOP ($3500 + $497/mo)',3500,7500,'Ivy','Walter'],
+  ['7/17/2026','Jeramie','TOP (3 Pay)',2500,7500,'Marketing','Aaron'],
+  ['7/18/2026','Mark Neumann','TOP (3500 + 497/mo)',3500,7500,'Shahbaz','Finlay'],
+  ['7/28/26','Traci William','TOP (3.5k + 4x 1k)',3500,7500,'Marketing','Finlay'],
+  ['7/30/26','Susannah Tye','TOP PIF',7000,7000,'Shahbaz','Finlay'],
+  // ── AUGUST ──
+  ['8/1/2026','Parm Gill','TOP PIF',7500,7500,'Paulina','Finlay'],
+  ['8/3/26','Luis Correa','TOP (3 Pay)',2500,7500,'Shahbaz','Walter'],
+  ['8/6/2026','Jasceaka Hussey','TOP (PIF)',7500,7500,'Angelica','Walter'],
+  ['8/7/2026','Ivan Shulman','TOP - 1K monthly',1000,1000,'Shahbaz','Walter'],
+  ['8/7/2026','Mary Brake','TOP (PIF)',7500,7500,'Michael','Finlay'],
+  ['8/7/26','Jackie Cecchini','TOP 3500 497',3400,7500,'Max Lewis','Finlay'],
+  ['8/9/26','James Mitchelle','Accelerator (2 Pay)',1750,3500,'Shahbaz','Finlay'],
+  ['8/12/26','Robert Schaffler','TOP (Upgrade from 1k p/m)',5500,7500,'Paulina','Finlay'],
+  ['8/12/26','Paul Cooper','TOP (3500 + 497/mo)',3500,7500,'Angelica','Walter'],
+  ['8/13/26','Darren Huseby','TOP (1k)',1000,7500,'Shahbaz','Walter'],
+  ['8/17/26','Doona Sider','TOP Renewal',1000,7500,'Angelica','Walter'],
+  ['8/17/26','Susan Fahnestock-Draybuck','TOP (3 Pay)',2500,7500,'Michael','Walter'],
+  ['8/20/26','Maff Sundararajah','Accerator (2 pay)',1750,3500,'Shahbaz','Jason'],
+  ['8/22/26','Matt','TOP (3 Pay)',2500,7500,'Paulina','Jason'],
+  ['8/27/26','Vicky Girouard','Renewal',1750,7500,'Doru','Doru'],
+  // ── SEPTEMBER ──
+  ['9/1/2026','Amanda Videll','TOP 3 Pay',2500,7500,'Shawna','Walter'],
+  ['9/1/2026','Majed Diab','TOP PIF',7500,7500,'Shahbaz','Walter'],
+  ['9/2/2026','David Lee','Accelerator PF',3500,3500,'Shahbaz','Finlay'],
+  ['9/7/2026','Mitch Allen','TOP PIF',7500,7500,'Shahbaz','Walter'],
+  ['9/8/2026','Pedro Antunes','TOP PIF',7500,7500,'','Walter'],
+  ['9/9/2026','Christopher Craig','TOP (10 Pay)',1000,10000,'N/a','Finlay'],
+  ['9/9/2026','Brian Saulsberry','TOP (6 pay)',1250,7500,'Aaron','Ivy'],
+  ['9/10/2026','Andy Kiriev','TOP ($3500 down + $497/mo)',497,7500,'Shahbaz','Walter'],
+  ['9/12/2026','Adam Courville','TOP ($3500 down + $497/mo)',497,7500,'Shahbaz','Walter'],
+  ['9/12/2026','Kaveh Niknia','TOP (6 pay)',1250,7500,'Shahbaz','Aaron'],
+  ['9/14/2026','Marcus Webb','TOP PIF',7500,7500,'Ivy','Jason'],
+  ['9/15/2026','Vicky Girouard','Renewal',1750,7500,'Doru','Doru'],
+  ['9/17/2026','Jeramie','TOP (3 Pay)',2500,7500,'Marketing','Aaron'],
+  ['9/17/2026','Robert Schaffler','TOP (1kpm)',1000,7500,'Paulina','Finlay'],
+  ['9/19/2026','Matthew Lewis','TOP ($3500 + $497/mo)',497,7500,'Michael','Walter'],
+  ['9/19/2026','Matthew Spera','Accelerator',1000,3500,'Shahbaz','Finlay'],
+  ['9/21/2026','Zak Zephyr','TOP (3 Pay)',2500,7500,'Michael','Finlay'],
+  ['9/22/2026','Matt','TOP (3 Pay)',2500,7500,'Paulina','Jason'],
+  ['9/23/2026','Dina Georgiou','TOP (1250X4)',1250,7500,'Angelica','Aaron'],
+  ['9/25/2026','Sandra Cole','TOP PIF',7500,7500,'Shawna','Walter'],
+  ['9/26/2026','Tom Ridge','TOP PIF',7500,7500,'Michael','Walter'],
+  ['9/27/2026','Laura Finn','TOP (3 Pay)',2500,7500,'Ivy','Jason'],
+  // ── OCTOBER ──
+  ['10/2/2026','Shanda Shepard','TOP PIF',7500,7500,'Angelica','Finlay'],
+  ['10/3/2026','Obiageli Ezewuiro','TOP 2 Pay',3750,7500,'Angelica','Finlay'],
+  ['10/6/2026','Mihai Vlaicov','TOP 3.5k 4x 1k',3500,7500,'Paulina','Finlay'],
+  ['10/6/2026','Sky Kubby','TOP 1kpm',1000,8500,'Shahbaz','Lewie'],
+  ['10/6/2026','Dr. Raluca','TOP (3 Pay)',2500,7500,'Angelica','Walter'],
+  ['10/7/2026','Brian Saulsberry','TOP (6 pay)',1250,7500,'Aaron','Ivy'],
+  ['10/9/2026','Christopher Craig','TOP (10 Pay)',1000,10000,'N/a','Finlay'],
+  ['10/10/2026','Maria Santos','TOP PIF',7500,7500,'Michael','Walter'],
+  ['10/13/2026','Mitch Allen','TOP PIF',7500,7500,'Shahbaz','Walter'],
+  ['10/14/2026','Pedro Antunes','TOP PIF',7500,7500,'','Walter'],
+  ['10/15/2026','Marcus Webb','TOP PIF',7500,7500,'Ivy','Jason'],
+  ['10/16/2026','Laura Finn','TOP (3 Pay)',2500,7500,'Ivy','Jason'],
+  ['10/17/2026','Sandra Cole','TOP PIF',7500,7500,'Shawna','Walter'],
+  ['10/20/2026','Tom Ridge','TOP PIF',7500,7500,'Michael','Walter'],
+  ['10/21/2026','David Lee','TOP (3 Pay)',2500,7500,'Shahbaz','Walter'],
+  ['10/22/2026','Ashley Brooks','Accelerator PIF',3500,3500,'Shawna','Walter'],
+  ['10/23/2026','Ryan Cooper','TOP PIF',7500,7500,'Ivy','Jason'],
+  ['10/24/2026','Emily Walsh','TOP (2 Pay)',3750,7500,'N/A','Walter']
 ];
 
 // ─── STATE ─────────────────────────────────────────────────────────────────
@@ -400,59 +581,20 @@ function applyDateRange(){
   render();
 }
 
-// ─── CSV PARSER ────────────────────────────────────────────────────────────
-function splitCSVRecords(text){
-  var records=[]; var cur=''; var inQ=false;
-  for(var i=0;i<text.length;i++){
-    var c=text[i];
-    if(c==='"'){ inQ=!inQ; cur+=c; }
-    else if(c==='\n'&&!inQ){ records.push(cur); cur=''; }
-    else{ cur+=c; }
-  }
-  if(cur.trim()) records.push(cur);
-  return records;
-}
-
-function parseCSVLine(line){
-  var fields=[]; var cur=''; var inQ=false;
-  for(var i=0;i<line.length;i++){
-    var c=line[i];
-    if(c==='"'){ inQ=!inQ; }
-    else if(c===','&&!inQ){ fields.push(cur.trim()); cur=''; }
-    else{ cur+=c; }
-  }
-  fields.push(cur.trim());
-  return fields;
-}
-
-// ─── FETCH ─────────────────────────────────────────────────────────────────
-async function fetchTab(tab){
-  var url = SHEET_WORKER+'?tab='+encodeURIComponent(tab.tab);
-  try{
-    var r = await fetch(url);
-    if(!r.ok) return [];
-    var text = await r.text();
-    var records = splitCSVRecords(text);
-    if(records.length<2) return [];
-    var headers = parseCSVLine(records[0]);
-    var rows = [];
-    for(var i=1;i<records.length;i++){
-      var vals = parseCSVLine(records[i]);
-      if(vals.length<2||vals.every(function(v){return !v.trim();})) continue;
-      var obj={};
-      for(var j=0;j<headers.length;j++) obj[headers[j]] = vals[j]||'';
-      rows.push(obj);
-    }
-    return rows;
-  }catch(e){ return []; }
-}
-
-async function fetchAllTabs(){
-  var results = await Promise.all(TABS.map(function(t){ return fetchTab(t); }));
-  // (TABS is now array of {label, gid} objects)
-  var combined = [];
-  for(var i=0;i<results.length;i++) combined = combined.concat(results[i]);
-  return combined;
+// ─── LOAD EMBEDDED DATA ────────────────────────────────────────────────────
+// EMBEDDED_ROWS columns: [Date, Student Name, TOP/INC, Cash Collected, Revenue, Setter, Closer]
+function loadEmbeddedData(){
+  return EMBEDDED_ROWS.map(function(r){
+    return {
+      'Date':            r[0]||'',
+      'Student Name':    r[1]||'',
+      'TOP/INC':         r[2]||'',
+      'Cash Collected':  r[3]||0,
+      'Revenue':         r[4]||0,
+      'Setter':          r[5]||'',
+      'Closer':          r[6]||''
+    };
+  });
 }
 
 async function refreshClose(){
@@ -466,30 +608,14 @@ async function refreshClose(){
 
 // ─── COLUMN DETECTION ──────────────────────────────────────────────────────
 function detectCols(rows){
-  if(!rows||!rows.length) return;
-  // Pick sample row with most keys
-  var sample = rows.reduce(function(best,r){ return Object.keys(r).length>Object.keys(best).length?r:best; }, rows[0]);
-  COLS.date    = findColKey(sample,['date'])||'Date';
-  COLS.cash    = findColKey(sample,['cash collected','cash'])||'Cash Collected';
-  COLS.revenue = findColKey(sample,['contract value','revenue','contract'])||'Contract Value';
-  COLS.product = findColKey(sample,['top/inc','product','program'])||'TOP/INC';
-  COLS.setter  = findColKey(sample,['setter'])||'Setter';
-  COLS.closer  = findColKey(sample,['closer','sales person'])||'Closer';
-  console.log('COLS detected:', JSON.stringify(COLS));
+  // Fixed column names matching our embedded data format
+  COLS.date    = 'Date';
+  COLS.cash    = 'Cash Collected';
+  COLS.revenue = 'Revenue';
+  COLS.product = 'TOP/INC';
+  COLS.setter  = 'Setter';
+  COLS.closer  = 'Closer';
   console.log('Total rows loaded:', rows.length);
-  // Count rows per month prefix to see data distribution
-  var monthCounts={};
-  rows.forEach(function(r){
-    var raw=String(r[COLS.date]||'').trim();
-    var prefix=raw.split('/')[0]||'empty';
-    monthCounts[prefix]=(monthCounts[prefix]||0)+1;
-  });
-  console.log('Row count by month number prefix:', JSON.stringify(monthCounts));
-  // Sample dates from start, middle, end
-  console.log('First 5 dates:', JSON.stringify(rows.slice(0,5).map(function(r){return r[COLS.date];})));
-  var mid=Math.floor(rows.length/2);
-  console.log('Middle 5 dates:', JSON.stringify(rows.slice(mid,mid+5).map(function(r){return r[COLS.date];})));
-  console.log('Last 5 dates:', JSON.stringify(rows.slice(-5).map(function(r){return r[COLS.date];})));
 }
 
 // ─── FILTER ────────────────────────────────────────────────────────────────
@@ -731,26 +857,18 @@ document.addEventListener('DOMContentLoaded', function(){
   var loadingEl = document.getElementById('loading');
   var appEl     = document.getElementById('app');
 
-  Promise.all([fetchAllTabs(), refreshClose()]).then(function(results){
-    allRows   = results[0];
-    closeData = results[1];
-    detectCols(allRows);
+  // Load embedded data immediately (no network needed for sheet data)
+  allRows = loadEmbeddedData();
+  detectCols(allRows);
 
-    if(!allRows.length){
-      var banner = document.getElementById('err-banner');
-      banner.textContent = 'Could not load sheet data. Check that the Cloudflare Worker is running and the Google Sheet is published.';
-      banner.style.display = 'block';
-    }
-
+  // Still try to fetch Close CRM data for bookings/shows
+  refreshClose().then(function(cd){
+    closeData = cd;
     render();
-
     loadingEl.style.display = 'none';
     appEl.style.display = 'flex';
-  }).catch(function(err){
-    console.error('Dashboard init error:', err);
-    var banner = document.getElementById('err-banner');
-    banner.textContent = 'Error loading dashboard: '+err.message;
-    banner.style.display = 'block';
+  }).catch(function(){
+    render();
     loadingEl.style.display = 'none';
     appEl.style.display = 'flex';
   });
