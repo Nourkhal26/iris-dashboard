@@ -207,9 +207,9 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter',-apple-system,Blin
       <div class="topbar-r">
         <span class="client-badge">Capitalism.com</span>
         <span class="date-label">From</span>
-        <input type="date" id="dateFrom" class="date-input">
+        <input type="text" id="dateFrom" class="date-input" placeholder="MM/DD/YYYY" maxlength="10">
         <span class="date-label">To</span>
-        <input type="date" id="dateTo" class="date-input">
+        <input type="text" id="dateTo" class="date-input" placeholder="MM/DD/YYYY" maxlength="10">
         <button class="apply-btn" onclick="applyDateRange()">Apply</button>
       </div>
     </div>
@@ -854,15 +854,15 @@ function setDefault(){
   // Default to Jan 1 – Oct 31 2026 (full range of embedded data)
   dateFrom = new Date(2026,0,1);
   dateTo   = new Date(2026,9,31);
-  document.getElementById('dateFrom').value = '2026-01-01';
-  document.getElementById('dateTo').value   = '2026-10-31';
+  document.getElementById('dateFrom').value = '01/01/2026';
+  document.getElementById('dateTo').value   = '10/31/2026';
 }
 
 function applyDateRange(){
   var f = document.getElementById('dateFrom').value;
   var t = document.getElementById('dateTo').value;
-  if(f) dateFrom = new Date(f+'T00:00:00');
-  if(t) dateTo   = new Date(t+'T23:59:59');
+  if(f) dateFrom = parseDate(f) || new Date(f+'T00:00:00');
+  if(t){ var td = parseDate(t); if(td){ dateTo = new Date(td.getFullYear(),td.getMonth(),td.getDate(),23,59,59); } else { dateTo = new Date(t+'T23:59:59'); } }
   render();
 }
 
