@@ -319,7 +319,21 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter',-apple-system,Blin
 // ─── CONFIG ────────────────────────────────────────────────────────────────
 var SHEET_WORKER = 'https://morning-water-057d.nour-2ba.workers.dev';
 var CLOSE_WORKER = 'https://fancy-haze-d904.nour-2ba.workers.dev';
-var TABS = ['1.2026','2.2026','3.2026','4.2026','5.2026','6.2026','7.2026','8.2026','9.2026','10.2026','11.2026','12.2026'];
+// tab = sheet name e.g. "1.2026"
+var TABS = [
+  {label:'Jan', tab:'1.2026'},
+  {label:'Feb', tab:'2.2026'},
+  {label:'Mar', tab:'3.2026'},
+  {label:'Apr', tab:'4.2026'},
+  {label:'May', tab:'5.2026'},
+  {label:'Jun', tab:'6.2026'},
+  {label:'Jul', tab:'7.2026'},
+  {label:'Aug', tab:'8.2026'},
+  {label:'Sep', tab:'9.2026'},
+  {label:'Oct', tab:'10.2026'},
+  {label:'Nov', tab:'11.2026'},
+  {label:'Dec', tab:'12.2026'}
+];
 
 // ─── STATE ─────────────────────────────────────────────────────────────────
 var allRows = [];
@@ -413,7 +427,7 @@ function parseCSVLine(line){
 
 // ─── FETCH ─────────────────────────────────────────────────────────────────
 async function fetchTab(tab){
-  var url = SHEET_WORKER+'?tab='+encodeURIComponent(tab);
+  var url = SHEET_WORKER+'?tab='+encodeURIComponent(tab.tab);
   try{
     var r = await fetch(url);
     if(!r.ok) return [];
@@ -435,6 +449,7 @@ async function fetchTab(tab){
 
 async function fetchAllTabs(){
   var results = await Promise.all(TABS.map(function(t){ return fetchTab(t); }));
+  // (TABS is now array of {label, gid} objects)
   var combined = [];
   for(var i=0;i<results.length;i++) combined = combined.concat(results[i]);
   return combined;
